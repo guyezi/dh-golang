@@ -56,6 +56,14 @@ sub configure {
 
     my $install_all = (exists($ENV{DH_GOLANG_INSTALL_ALL}) &&
                        $ENV{DH_GOLANG_INSTALL_ALL} == 1);
+
+    # By default, only .go files are installed.
+    my @installed_file_extensions = ('.go');
+    if (exists($ENV{DH_GOLANG_INSTALL_EXTRA_EXTENSIONS})) {
+        push(@installed_file_extensions,
+             split(',', $ENV{DH_GOLANG_INSTALL_EXTRA_EXTENSIONS}));
+    }
+
     my @sourcefiles;
     find({
         # Ignores ./debian entirely, but not e.g. foo/debian/debian.go
@@ -69,8 +77,18 @@ sub configure {
             my $name = $File::Find::name;
             if ($install_all) {
                 # All files will be installed
-            } elsif (substr($name, -3) ne '.go') {
-                return;
+            } else {
+                my $matched_extension = 0;
+                foreach (@installed_file_extensions)
+                {
+                      if (substr($name, -length($_)) eq $_){
+                          $matched_extension = 1;
+                          last;
+                      }
+                }
+                if (not $matched_extension) {
+                    return;
+                }
             }
             return unless -f $name;
             # Store regexp/utf.go instead of ./regexp/utf.go
