@@ -49,15 +49,18 @@ my $tmpdir = tempdir("dh_golang_XXXXXXX", TMPDIR => 1);
 system("go list -f \"$tmpl\" @targets > $tmpdir/godeps") == 0
     or die "go list of targets failed with code $?, $!";
 
-system("sort -u $tmpdir/godeps | xargs go list -f '{{ .Dir }}' > $tmpdir/godirs") == 0
+my $gofiletmpl = '\
+{{ .Dir }}/{{ index (or .GoFiles .CgoFiles .TestGoFiles .XTestGoFiles .IgnoredGoFiles) 0 }}';
+
+system("sort -u $tmpdir/godeps | xargs go list -f '$gofiletmpl' > $tmpdir/gofiles") == 0
     or die "go list of dependencies failed with code $?, $!";
 
-open(my $inp, "<", "$tmpdir/godirs");
-open(my $outp, ">", "$tmpdir/realgodirs");
+open(my $inp, "<", "$tmpdir/gofiles");
+open(my $outp, ">", "$tmpdir/realgofiles");
 while (<$inp>) {
     chomp;
     my $realpath = realpath($_);
-    # godirs will include the directories of the package being built, so exclude them.
+    # gofiles will include packages being built, so exclude those.
     if ($realpath !~ /^\Q$bs->{cwd}\E/) {
         printf $outp "%s\n", $realpath;
     }
@@ -65,7 +68,7 @@ while (<$inp>) {
 close($inp);
 close($outp);
 
-system("cat $tmpdir/realgodirs | xargs -r dpkg-query --search > $tmpdir/pkgs") == 0
+system("cat $tmpdir/realgofiles | xargs -r dpkg-query --search > $tmpdir/pkgs") == 0
     or die "dpkg-query --search failed with code $?, $!";
 
 my $built_using = `cut -d: -f1 $tmpdir/pkgs | sort -u | xargs -r dpkg-query -f='\${source:Package} (= \${source:Version}), ' -W`;

@@ -2,6 +2,8 @@ dh-golang (1.18) UNRELEASED; urgency=medium
 
   * Yet another corner case in dh_golang, this one only shows up with gccgo.
     (Closes: 823136)
+  * Pass a go file, not a directory, to dpkg-search in dh_golang so that only
+    one package is returned. (Closes: 827219)
 
  -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Sun, 01 May 2016 22:28:04 +1200
 
