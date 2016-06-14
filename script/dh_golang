@@ -11,6 +11,7 @@ use Cwd qw(realpath);
 use Debian::Debhelper::Dh_Lib; # not in core
 use Debian::Debhelper::Dh_Buildsystems; # not in core
 use File::Temp qw(tempdir);
+use File::Path qw(rmtree);
 
 =head1 SYNOPSIS
 
@@ -43,7 +44,7 @@ my @targets = $bs->get_targets();
 my $tmpl = '{{ range .Deps }}{{.}}
 {{ end }}';
 
-my $tmpdir = tempdir("dh_golang_XXXXXXX", TMPDIR => 1, CLEANUP => 1);
+my $tmpdir = tempdir("dh_golang_XXXXXXX", TMPDIR => 1);
 
 system("go list -f \"$tmpl\" @targets > $tmpdir/godeps") == 0
     or die "go list of targets failed with code $?, $!";
@@ -71,6 +72,8 @@ my $built_using = `cut -d: -f1 $tmpdir/pkgs | sort -u | xargs -r dpkg-query -f='
 if ($? != 0) {
     die "dpkg-query -W failed with code $?, $!";
 }
+
+rmtree($tmpdir);
 
 # If there is an easier way to have a universal misc:Built-Using on all binary
 # packages, I am happy to merge your patch :).
