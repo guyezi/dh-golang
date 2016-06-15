@@ -1,11 +1,12 @@
-dh-golang (1.18) UNRELEASED; urgency=medium
+dh-golang (1.18) unstable; urgency=medium
 
+  * Team upload.
   * Yet another corner case in dh_golang, this one only shows up with gccgo.
     (Closes: 823136)
   * Pass a go file, not a directory, to dpkg-search in dh_golang so that only
     one package is returned. (Closes: 827219)
 
- -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Sun, 01 May 2016 22:28:04 +1200
+ -- Michael Hudson-Doyle <michael.hudson@ubuntu.com>  Wed, 15 Jun 2016 18:56:39 +1000
 
 dh-golang (1.17) unstable; urgency=medium
 
