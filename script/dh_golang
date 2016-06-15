@@ -71,10 +71,14 @@ close($outp);
 system("cat $tmpdir/realgofiles | xargs -r dpkg-query --search > $tmpdir/pkgs") == 0
     or die "dpkg-query --search failed with code $?, $!";
 
-my $built_using = `cut -d: -f1 $tmpdir/pkgs | sort -u | xargs -r dpkg-query -f='\${source:Package} (= \${source:Version}), ' -W`;
+system("cut -d: -f1 $tmpdir/pkgs | sort -u | xargs -r dpkg-query -f='\${source:Package} (= \${source:Version})\n' -W > $tmpdir/srcpkgs");
 if ($? != 0) {
     die "dpkg-query -W failed with code $?, $!";
 }
+
+my $built_using = `cat $tmpdir/srcpkgs | sort -u`;
+
+$built_using =~ s/\n/, /g;
 
 rmtree($tmpdir);
 
