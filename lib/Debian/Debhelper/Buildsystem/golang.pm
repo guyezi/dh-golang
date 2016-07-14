@@ -43,7 +43,7 @@ sub _set_gopath {
 sub _link_contents {
     my ($src, $dst) = @_;
 
-    my @contents = <$src/*>;
+    my @contents = glob "$src/*";
     # Safety-Check: We are already _in_ a Go library. Don’t copy its
     # subfolders, this has no use and potentially only screws things up.
     # This situation should never happen, unless some package ships files that
@@ -212,7 +212,7 @@ sub install {
         }
     }
 
-    my @binaries = <$builddir/bin/*>;
+    my @binaries = glob "$builddir/bin/*";
     if ($install_binaries and @binaries > 0) {
         $this->doit_in_builddir('mkdir', '-p', "$destdir/usr");
         $this->doit_in_builddir('cp', '-r', 'bin', "$destdir/usr");
