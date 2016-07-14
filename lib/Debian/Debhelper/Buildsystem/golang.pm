@@ -183,6 +183,7 @@ sub build {
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
+    unshift @_, ('-p', $this->get_parallel());
     $this->doit_in_builddir("go", "install", "-v", @_, get_targets());
 }
 
@@ -190,6 +191,7 @@ sub test {
     my $this = shift;
 
     $this->_set_gopath();
+    unshift @_, ('-p', $this->get_parallel());
     $this->doit_in_builddir("go", "test", "-v", @_, get_targets());
 }
 
