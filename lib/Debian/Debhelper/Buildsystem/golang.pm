@@ -54,7 +54,11 @@ sub _link_contents {
     for my $dir (@dirs) {
         my $base = basename($dir);
         if (-d "$dst/$base") {
-            _link_contents("$src/$base", "$dst/$base");
+            if ( 0 <= index($dir, q{/usr/share/gocode/src/}.$ENV{DH_GOPKG}) ){
+                warning( qq{"$ENV{DH_GOPKG}" is already installed. Please check for circular dependencies.\n} );
+            }else{
+                _link_contents("$src/$base", "$dst/$base");
+            }
         } else {
             verbose_print("Symlink $src/$base -> $dst/$base");
             symlink("$src/$base", "$dst/$base");
