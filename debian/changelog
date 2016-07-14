@@ -1,9 +1,16 @@
-dh-golang (1.19) UNRELEASED; urgency=medium
+dh-golang (1.19) unstable; urgency=medium
 
   * Team upload.
+
+  [ Paul Tagliamonte ]
   * Use a secure transport for the Vcs-Git and Vcs-Browser URL
 
- -- Paul Tagliamonte <paultag@debian.org>  Wed, 29 Jun 2016 20:20:48 -0400
+  [ Dmitry Smirnov ]
+  * Perlcritic corrections for "Glob written as <...>".
+  * Avoid linking pre-installed DH_GOPKG package to itself (Closes: #827226).
+  * Respect "--parallel" and "--max-parallel" options (Closes: #829302).
+
+ -- Dmitry Smirnov <onlyjob@debian.org>  Thu, 14 Jul 2016 15:07:49 +1000
 
 dh-golang (1.18) unstable; urgency=medium
 
