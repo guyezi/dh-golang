@@ -11,6 +11,7 @@ use Cwd qw(realpath);
 use Debian::Debhelper::Dh_Lib; # not in core
 use Debian::Debhelper::Dh_Buildsystems; # not in core
 use File::Temp qw(tempdir);
+use File::Path qw(rmtree);
 
 =head1 SYNOPSIS
 
@@ -43,20 +44,23 @@ my @targets = $bs->get_targets();
 my $tmpl = '{{ range .Deps }}{{.}}
 {{ end }}';
 
-my $tmpdir = tempdir("dh_golang_XXXXXXX", TMPDIR => 1, CLEANUP => 1);
+my $tmpdir = tempdir("dh_golang_XXXXXXX", TMPDIR => 1);
 
 system("go list -f \"$tmpl\" @targets > $tmpdir/godeps") == 0
     or die "go list of targets failed with code $?, $!";
 
-system("sort -u $tmpdir/godeps | xargs go list -f '{{ .Dir }}' > $tmpdir/godirs") == 0
+my $gofiletmpl = '\
+{{ .Dir }}/{{ index (or .GoFiles .CgoFiles .TestGoFiles .XTestGoFiles .IgnoredGoFiles) 0 }}';
+
+system("sort -u $tmpdir/godeps | xargs go list -f '$gofiletmpl' > $tmpdir/gofiles") == 0
     or die "go list of dependencies failed with code $?, $!";
 
-open(my $inp, "<", "$tmpdir/godirs");
-open(my $outp, ">", "$tmpdir/realgodirs");
+open(my $inp, "<", "$tmpdir/gofiles");
+open(my $outp, ">", "$tmpdir/realgofiles");
 while (<$inp>) {
     chomp;
     my $realpath = realpath($_);
-    # godirs will include the directories of the package being built, so exclude them.
+    # gofiles will include packages being built, so exclude those.
     if ($realpath !~ /^\Q$bs->{cwd}\E/) {
         printf $outp "%s\n", $realpath;
     }
@@ -64,13 +68,19 @@ while (<$inp>) {
 close($inp);
 close($outp);
 
-system("cat $tmpdir/realgodirs | xargs dpkg-query --search > $tmpdir/pkgs") == 0
+system("cat $tmpdir/realgofiles | xargs -r dpkg-query --search > $tmpdir/pkgs") == 0
     or die "dpkg-query --search failed with code $?, $!";
 
-my $built_using = `cut -d: -f1 $tmpdir/pkgs | sort -u | xargs dpkg-query -f='\${source:Package} (= \${source:Version}), ' -W`;
+system("cut -d: -f1 $tmpdir/pkgs | sort -u | xargs -r dpkg-query -f='\${source:Package} (= \${source:Version})\n' -W > $tmpdir/srcpkgs");
 if ($? != 0) {
     die "dpkg-query -W failed with code $?, $!";
 }
+
+my $built_using = `cat $tmpdir/srcpkgs | sort -u`;
+
+$built_using =~ s/\n/, /g;
+
+rmtree($tmpdir);
 
 # If there is an easier way to have a universal misc:Built-Using on all binary
 # packages, I am happy to merge your patch :).

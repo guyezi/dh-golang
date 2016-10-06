@@ -43,7 +43,7 @@ sub _set_gopath {
 sub _link_contents {
     my ($src, $dst) = @_;
 
-    my @contents = <$src/*>;
+    my @contents = glob "$src/*";
     # Safety-Check: We are already _in_ a Go library. Don’t copy its
     # subfolders, this has no use and potentially only screws things up.
     # This situation should never happen, unless some package ships files that
@@ -54,7 +54,11 @@ sub _link_contents {
     for my $dir (@dirs) {
         my $base = basename($dir);
         if (-d "$dst/$base") {
-            _link_contents("$src/$base", "$dst/$base");
+            if ( 0 <= index($dir, q{/usr/share/gocode/src/}.$ENV{DH_GOPKG}) ){
+                warning( qq{"$ENV{DH_GOPKG}" is already installed. Please check for circular dependencies.\n} );
+            }else{
+                _link_contents("$src/$base", "$dst/$base");
+            }
         } else {
             verbose_print("Symlink $src/$base -> $dst/$base");
             symlink("$src/$base", "$dst/$base");
@@ -179,6 +183,7 @@ sub build {
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
+    unshift @_, ('-p', $this->get_parallel());
     $this->doit_in_builddir("go", "install", "-v", @_, get_targets());
 }
 
@@ -186,6 +191,7 @@ sub test {
     my $this = shift;
 
     $this->_set_gopath();
+    unshift @_, ('-p', $this->get_parallel());
     $this->doit_in_builddir("go", "test", "-v", @_, get_targets());
 }
 
@@ -208,7 +214,7 @@ sub install {
         }
     }
 
-    my @binaries = <$builddir/bin/*>;
+    my @binaries = glob "$builddir/bin/*";
     if ($install_binaries and @binaries > 0) {
         $this->doit_in_builddir('mkdir', '-p', "$destdir/usr");
         $this->doit_in_builddir('cp', '-r', 'bin', "$destdir/usr");
