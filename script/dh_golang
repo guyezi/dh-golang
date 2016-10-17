@@ -98,6 +98,11 @@ my $built_using = join ', ', uniq(@srcdeps);
 # If there is an easier way to have a universal misc:Built-Using on all binary
 # packages, I am happy to merge your patch :).
 foreach my $package (@{$dh{DOPACKAGES}}) {
+    # Skip adding the misc:Built-Using substvar if the package is
+    # architecture independent, as those should not end up embeddeding
+    # other Go modules.
+    next if package_arch($package) eq 'all';
+
     addsubstvar($package, "misc:Built-Using", $built_using);
 }
 
