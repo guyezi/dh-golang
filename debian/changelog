@@ -4,6 +4,8 @@ dh-golang (1.20) UNRELEASED; urgency=medium
   * Stop forcing the compression to xz, and that has been the default for some
     time now, even Debian stable has that. Thanks to Guillem Jover for the
     patch. Closes: #840821.
+  * Rewrite of dh_golang for a more robust and idiomatic perl. Patch by
+    Guillem Jover. Closes: #841145.
 
  -- Martín Ferrari <tincho@debian.org>  Fri, 21 Oct 2016 00:44:46 +0200
 
