@@ -84,7 +84,9 @@ sub configure {
     my %whitelisted_exts = (
         '.go' => 1,
         '.c' => 1,
+        '.cc' => 1,
         '.h' => 1,
+        '.hh' => 1,
         '.proto' => 1,
         '.s' => 1,
     );
