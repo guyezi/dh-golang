@@ -1,8 +1,18 @@
+dh-golang (1.21) UNRELEASED; urgency=medium
+
+  * Team upload.
+
+  [ Martín Ferrari ]
+  * Add a new script to be used by autopkgtest/autodep8 to automatically run
+    package tests on installed packages.
+
+ -- Martín Ferrari <tincho@debian.org>  Thu, 25 May 2017 04:48:33 +0100
+
 dh-golang (1.20) unstable; urgency=medium
 
   * Team upload.
 
-  [ Martín Ferrari 
+  [ Martín Ferrari ]
   * Stop forcing the compression to xz, and that has been the default for some
     time now, even Debian stable has that. Thanks to Guillem Jover for the
     patch. Closes: #840821.
