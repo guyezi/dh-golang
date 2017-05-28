@@ -5,6 +5,7 @@ dh-golang (1.21) UNRELEASED; urgency=medium
   [ Martín Ferrari ]
   * Add a new script to be used by autopkgtest/autodep8 to automatically run
     package tests on installed packages.
+  * Add myself as Uploader.
 
  -- Martín Ferrari <tincho@debian.org>  Thu, 25 May 2017 04:48:33 +0100
 
