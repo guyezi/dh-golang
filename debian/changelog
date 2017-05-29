@@ -1,3 +1,9 @@
+dh-golang (1.21.1) UNRELEASED; urgency=medium
+
+  * Actually install the new script introduced in 1.21.
+
+ -- Martín Ferrari <tincho@debian.org>  Mon, 29 May 2017 05:59:36 +0100
+
 dh-golang (1.21) unstable; urgency=medium
 
   * Add a new script to be used by autopkgtest/autodep8 to automatically run
