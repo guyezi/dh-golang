@@ -186,7 +186,7 @@ sub build {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
     unshift @_, ('-p', $this->get_parallel());
-    $this->doit_in_builddir("go", "install", "-v", @_, get_targets());
+    $this->doit_in_builddir("go", "install", "-gcflags=\"-trimpath=" . $ENV{GOPATH} . "/src\"", "-v", @_, get_targets());
 }
 
 sub test {
