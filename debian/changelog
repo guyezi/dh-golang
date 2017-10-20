@@ -1,3 +1,9 @@
+dh-golang (1.24) unstable; urgency=medium
+
+  * Fix build system documentation regarding --no-source/--no-binaries
+
+ -- Michael Stapelberg <stapelberg@debian.org>  Fri, 20 Oct 2017 19:42:14 +0200
+
 dh-golang (1.23) unstable; urgency=medium
 
   * Document Debian::Debhelper::Buildsystem::golang (Closes: #839108)
