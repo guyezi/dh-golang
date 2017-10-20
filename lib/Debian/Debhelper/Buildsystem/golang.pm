@@ -52,6 +52,10 @@ Removes the build directory.
 
 =over
 
+=item B<dh_auto_install>
+
+=over
+
 =item B<--no-source>
 
 By default, all files within the src/ subdirectory of the build directory will
@@ -61,8 +65,8 @@ packaging a program (as opposed to a library).
 
 Example (in C<debian/rules>):
 
- %:
- 	dh $@ --buildsystem=golang --with=golang --no-source
+ override_dh_auto_install:
+ 	dh_auto_install --no-source
 
 =item B<--no-binaries>
 
@@ -72,12 +76,14 @@ C<--no-binaries> option disables this behavior.
 
 Example (in C<debian/rules>):
 
- %:
- 	dh $@ --buildsystem=golang --with=golang --no-binaries
+ override_dh_auto_install:
+ 	dh_auto_install --no-binaries
 
 Note: instead of using this option (which was added for symmetry with
 C<--no-source>), consider not building unwanted binaries in the first place to
 save CPU time on our build daemons; see C<DH_GOLANG_EXCLUDES>.
+
+=back
 
 =back
 
