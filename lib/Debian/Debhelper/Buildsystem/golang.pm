@@ -66,7 +66,7 @@ packaging a program (as opposed to a library).
 Example (in C<debian/rules>):
 
  override_dh_auto_install:
- 	dh_auto_install --no-source
+ 	dh_auto_install -- --no-source
 
 =item B<--no-binaries>
 
@@ -77,7 +77,7 @@ C<--no-binaries> option disables this behavior.
 Example (in C<debian/rules>):
 
  override_dh_auto_install:
- 	dh_auto_install --no-binaries
+ 	dh_auto_install -- --no-binaries
 
 Note: instead of using this option (which was added for symmetry with
 C<--no-source>), consider not building unwanted binaries in the first place to
