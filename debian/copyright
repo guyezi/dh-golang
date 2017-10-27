@@ -1,11 +1,11 @@
 Format: https://www.debian.org/doc/packaging-manuals/copyright-format/1.0/
 
 Files: *
-Copyright: 2013 Michael Stapelberg
+Copyright: 2013-2017 Michael Stapelberg
 License: GPL-2+
 
 Files: debian/*
-Copyright: 2013 Michael Stapelberg <stapelberg@debian.org>
+Copyright: 2013-2017 Michael Stapelberg <stapelberg@debian.org>
 License: GPL-2+
 
 License: GPL-2+
