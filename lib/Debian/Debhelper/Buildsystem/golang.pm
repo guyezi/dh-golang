@@ -209,7 +209,7 @@ and possibly fix any resulting breakages).
 
 use strict;
 use base 'Debian::Debhelper::Buildsystem';
-use Debian::Debhelper::Dh_Lib; 
+use Debian::Debhelper::Dh_Lib;
 use Dpkg::Control::Info;
 use File::Copy; # in core since 5.002
 use File::Path qw(make_path); # in core since 5.001
@@ -374,7 +374,8 @@ sub configure {
 sub get_targets {
     my $buildpkg = $ENV{DH_GOLANG_BUILDPKG} || "$ENV{DH_GOPKG}/...";
     my $output = qx(go list $buildpkg);
-    my @excludes = split(/ /, $ENV{DH_GOLANG_EXCLUDES});
+    my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) ?
+                    split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
     my @targets = split(/\n/, $output);
 
     # Remove all targets that are matched by one of the regular expressions in DH_GOLANG_EXCLUDES.
