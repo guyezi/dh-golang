@@ -1,6 +1,6 @@
 Source: dh-golang
 Section: devel
-Priority: extra
+Priority: optional
 Maintainer: Debian Go Packaging Team <pkg-go-maintainers@lists.alioth.debian.org>
 Uploaders: Michael Stapelberg <stapelberg@debian.org>,
            Martín Ferrari <tincho@debian.org>,
