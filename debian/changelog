@@ -1,3 +1,15 @@
+dh-golang (1.26) unstable; urgency=medium
+
+  * Team upload.
+  * Fix use of uninitialized value $ENV{"DH_GOLANG_EXCLUDES"}
+  * Use debhelper v10
+  * Update Standards-Version to 4.1.1
+    - Use Priority optional
+    - Use HTTPS URL for d/copyright
+  * Update years in d/copyright
+
+ -- Dr. Tobias Quathamer <toddy@debian.org>  Fri, 27 Oct 2017 22:31:24 +0200
+
 dh-golang (1.25) unstable; urgency=medium
 
   * Fix examples (again!)
@@ -109,7 +121,7 @@ dh-golang (1.16) unstable; urgency=medium
       files from the build directory.
     - Store package / directory lists in files and use xargs to avoid
       constructing over-long command lines.
-  * Also trim dh_golang's use statements. 
+  * Also trim dh_golang's use statements.
 
  -- Michael Stapelberg <stapelberg@debian.org>  Thu, 21 Apr 2016 09:38:34 +0200
 
