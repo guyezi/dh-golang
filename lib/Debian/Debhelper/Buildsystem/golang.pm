@@ -239,7 +239,12 @@ sub _set_dh_gopkg {
 
     my $control = Dpkg::Control::Info->new();
     my $source = $control->get_source();
-    $ENV{DH_GOPKG} = $source->{"XS-Go-Import-Path"};
+    # XS-Go-Import-Path can contain several paths. We use the first one.
+    # Example: XS-Go-Import-Path: github.com/go-mgo/mgo,
+    #                             gopkg.in/mgo.v2,
+    #                             labix.org/v2/mgo,
+    #                             launchpad.net/mgo
+    $ENV{DH_GOPKG} = (split ",", $source->{"XS-Go-Import-Path"})[0];
 }
 
 sub _set_gopath {
