@@ -55,7 +55,7 @@ sub exec_chunked {
 
     my @result;
     for (my $i = 0; $i < @list; $i += CHUNKSIZE) {
-        push @result, exec_single($cmd, @list[$i .. $i + CHUNKSIZE - 1]);
+        push @result, exec_single($cmd, splice(@list, $i, CHUNKSIZE));
     }
 
     return @result;
