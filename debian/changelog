@@ -1,3 +1,10 @@
+dh-golang (1.28) unstable; urgency=medium
+
+  [ Alexandre Viau ]
+  * support comma-separated paths in Go-Import-Path (Closes: #885780)
+
+ -- Michael Stapelberg <stapelberg@debian.org>  Wed, 03 Jan 2018 09:29:30 +0100
+
 dh-golang (1.27) unstable; urgency=medium
 
   * Team upload.
