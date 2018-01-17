@@ -57,19 +57,27 @@ call_rules() {
 }
 
 get_import_path() {
-    # Find package's import path from debian/rules or debian/control.
-    pkg=$(call_rules apt-print-DH_GOPKG)
+    # Find package's main import path from debian/rules or debian/control.
+    pkgs=$(call_rules apt-print-DH_GOPKG)
 
-    if [ -z "$pkg" ]; then
+    if [ -z "$pkgs" ]; then
         # DH_GOPKG not set, find it in control file.
-        pkg=$(perl -w -MDpkg::Control::Info -e '
+        pkgs=$(perl -w -MDpkg::Control::Info -e '
             my $s = Dpkg::Control::Info->new()->get_source();
             print $s->{"XS-Go-Import-Path"} || "";')
     fi
-    if [ -z "$pkg" ]; then
-        error "Can't find import path."
+
+    if [ -z "$pkgs" ]; then
+        error "Can't find import paths."
     fi
-    echo "$pkg"
+
+    # Transform into a single comma-separated line.
+    # Then, replace commas by spaces.
+    # Place the result into an array.
+    pkgs=($(echo $pkgs | tr -d " \n" | tr "," " "))
+
+    # Only return the first import path.
+    echo "${pkgs[0]}"
 }
 
 add_configure_override() {
