@@ -96,12 +96,16 @@ save CPU time on our build daemons; see C<DH_GOLANG_EXCLUDES>.
 C<DH_GOPKG> (string) contains the Go package name which this Debian package is
 building.
 
-C<DH_GOPKG> is automatically set to the value of the C<XS-Go-Import-Path>
-C<debian/control> field.
+C<DH_GOPKG> is automatically set to the value of the first import path of the
+C<XS-Go-Import-Path> C<debian/control> field, which can contain several
+comma-separated import paths.
 
 Example (in C<debian/control>):
 
- XS-Go-Import-Path: github.com/debian/ratt
+ XS-Go-Import-Path: github.com/go-mgo/mgo,
+                    gopkg.in/mgo.v2,
+                    labix.org/v2/mgo,
+                    launchpad.net/mgo
 
 Historical note: before the C<XS-Go-Import-Path> field was introduced, we used
 to set C<DH_GOPKG> in C<debian/rules>. When you encounter such a package, please

@@ -1,3 +1,11 @@
+dh-golang (1.29) unstable; urgency=medium
+
+  * Team upload.
+  * golang.pm: improve DH_GOPKG documentation by mentionning new
+    XS-Go-Import-Path format.
+
+ -- Alexandre Viau <aviau@debian.org>  Wed, 17 Jan 2018 01:07:21 -0500
+
 dh-golang (1.28) unstable; urgency=medium
 
   [ Alexandre Viau ]
