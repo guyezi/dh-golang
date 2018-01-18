@@ -1,3 +1,11 @@
+dh-golang (1.30) unstable; urgency=medium
+
+  [ aviau ]
+  * dh_golang_autopkgtest support for several import paths
+    (Closes: #887475)
+
+ -- Michael Stapelberg <stapelberg@debian.org>  Thu, 18 Jan 2018 22:34:39 +0100
+
 dh-golang (1.29) unstable; urgency=medium
 
   * Team upload.
