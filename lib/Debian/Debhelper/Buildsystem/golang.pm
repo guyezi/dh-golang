@@ -119,18 +119,19 @@ very hard to parse.
 C<DH_GOLANG_INSTALL_EXTRA> (list of strings, whitespace-separated, default
 empty) enumerates files and directories which are additionally installed into
 the build directory. By default, only files with the following extension are
-installed: .go, .c, .cc, .h, .hh, .proto, .s.
+installed: .go, .c, .cc, .h, .hh, .proto, .s. Starting with dh-golang 1.31,
+testdata directory contents are installed by default.
 
 Example (in C<debian/rules>):
 
- export DH_GOLANG_INSTALL_EXTRA := html/charset/testdata html/testdata \
-    bpf/testdata
+ export DH_GOLANG_INSTALL_EXTRA := example.toml marshal_test.toml
 
 =item DH_GOLANG_INSTALL_ALL
 
 C<DH_GOLANG_INSTALL_ALL> (bool, default false) controls whether all files are
 installed into the build directory. By default, only files with the following
-extension are installed: .go, .c, .cc, .h, .hh, .proto, .s.
+extension are installed: .go, .c, .cc, .h, .hh, .proto, .s. Starting with
+dh-golang 1.31, testdata directory contents are installed by default.
 
 Example (in C<debian/rules>):
 
@@ -218,6 +219,7 @@ use Dpkg::Control::Info;
 use File::Copy; # in core since 5.002
 use File::Path qw(make_path); # in core since 5.001
 use File::Find; # in core since 5
+use File::Spec; # in core since 5.00405
 
 sub DESCRIPTION {
     "Go"
@@ -326,12 +328,15 @@ sub configure {
             my $name = substr($File::Find::name, 2);
             if ($install_all) {
                 # All files will be installed
+	    } elsif ((grep { $_ eq "testdata" } File::Spec->splitdir($File::Find::dir)) > 0) {
+		# The go tool treats testdata directories as special, so install
+		# their contents by default.
             } else {
                 my $dot = rindex($name, ".");
                 return if $dot == -1;
                 return unless $whitelisted_exts{substr($name, $dot)};
             }
-            return unless -f $name;
+            return unless -e $name;
             push @sourcefiles, $name;
         },
         no_chdir => 1,
@@ -351,10 +356,22 @@ sub configure {
 
     for my $source (@sourcefiles) {
         my $dest = "$builddir/src/$ENV{DH_GOPKG}/$source";
-        make_path(dirname($dest));
         # Avoid re-copying the files, this would update their timestamp and
         # make go(1) recompile them.
-        next if -f $dest;
+        next if -e $dest;
+
+        if (-l $source) {
+            verbose_print("Symlink $dest");
+            symlink(readlink($source), $dest) or error("Could not symlink $dest: $!");
+            next;
+        }
+
+        if (-d $source) {
+            make_path($dest);
+            next;
+        }
+
+        make_path(dirname($dest));
         verbose_print("Copy $source -> $dest");
         copy($source, $dest) or error("Could not copy $source to $dest: $!");
     }
