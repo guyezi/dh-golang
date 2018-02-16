@@ -1,3 +1,9 @@
+dh-golang (1.31) unstable; urgency=medium
+
+  * Install testdata/ contents by default
+
+ -- Michael Stapelberg <stapelberg@debian.org>  Fri, 16 Feb 2018 09:11:32 +0100
+
 dh-golang (1.30) unstable; urgency=medium
 
   [ aviau ]
