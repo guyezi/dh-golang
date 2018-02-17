@@ -1,3 +1,9 @@
+dh-golang (1.32) unstable; urgency=medium
+
+  * Specify -vet=off for Go ≥ 1.10
+
+ -- Michael Stapelberg <stapelberg@debian.org>  Sat, 17 Feb 2018 12:40:07 +0100
+
 dh-golang (1.31) unstable; urgency=medium
 
   * Install testdata/ contents by default
