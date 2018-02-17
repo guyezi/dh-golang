@@ -258,6 +258,16 @@ sub _set_gopath {
     $ENV{GOPATH} = $this->{cwd} . '/' . $this->get_builddir();
 }
 
+sub _set_gocache {
+    # Honor the user’s wishes if GOCACHE was explicitly set, e.g. for speeding
+    # up builds/tests during local package development.
+    return if defined($ENV{GOCACHE}) && $ENV{GOCACHE} ne '';
+
+    # Explicitly setting the cache to off suppresses an error message when
+    # building with sbuild, where the default cache location is not writeable.
+    $ENV{GOCACHE} = "off";
+}
+
 sub _link_contents {
     my ($src, $dst) = @_;
 
@@ -416,6 +426,7 @@ sub build {
     my $this = shift;
 
     $this->_set_gopath();
+    $this->_set_gocache();
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
@@ -428,6 +439,7 @@ sub test {
     my $this = shift;
 
     $this->_set_gopath();
+    $this->_set_gocache();
     unshift @_, ('-p', $this->get_parallel());
     # Go 1.10 started calling “go vet” when running “go test”. This breaks tests
     # of many not-yet-fixed upstream packages, so we disable it for the time
