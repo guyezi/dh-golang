@@ -371,6 +371,7 @@ sub configure {
         next if -e $dest;
 
         if (-l $source) {
+            make_path(dirname($dest));
             verbose_print("Symlink $dest");
             symlink(readlink($source), $dest) or error("Could not symlink $dest: $!");
             next;
