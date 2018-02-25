@@ -1,3 +1,9 @@
+dh-golang (1.34) unstable; urgency=medium
+
+  * Bugfix: ensure destination directory exists (Closes: #891359)
+
+ -- Michael Stapelberg <stapelberg@debian.org>  Sun, 25 Feb 2018 23:47:46 +0100
+
 dh-golang (1.33) unstable; urgency=medium
 
   * Set GOCACHE to off (unless explicitly specified) to suppress errors
