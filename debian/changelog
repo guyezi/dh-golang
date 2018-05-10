@@ -1,8 +1,14 @@
-dh-golang (1.35) UNRELEASED; urgency=medium
+dh-golang (1.34~bpo9+1) stretch-backports; urgency=medium
 
+  * Team upload.
+
+  [ Alexandre Viau ]
   * Point Vcs-* urls to salsa.debian.org.
 
- -- Alexandre Viau <aviau@debian.org>  Mon, 02 Apr 2018 12:58:54 -0400
+  [ Anthony Fok ]
+  * Rebuild for stretch-backports.
+
+ -- Anthony Fok <foka@debian.org>  Thu, 10 May 2018 07:15:26 -0600
 
 dh-golang (1.34) unstable; urgency=medium
 
