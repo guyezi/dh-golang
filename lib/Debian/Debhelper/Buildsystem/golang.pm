@@ -107,6 +107,14 @@ Example (in C<debian/control>):
                     labix.org/v2/mgo,
                     launchpad.net/mgo
 
+C<DH_GOPKG> is set by dh-golang, and as a consequence it is not present in the
+C<debian/rules> environment. If you need to use the Go package name in the
+C<debian/rules> file, you must define it yourself.
+
+Example (in C<debian/rules>):
+
+ export DH_GOPKG := github.com/go-mgo/mgo
+
 Historical note: before the C<XS-Go-Import-Path> field was introduced, we used
 to set C<DH_GOPKG> in C<debian/rules>. When you encounter such a package, please
 convert it by moving the value from C<debian/rules> to C<debian/control>. It is
