@@ -173,11 +173,28 @@ C<DH_GOLANG_EXCLUDES> (list of Perl regular expressions, whitespace-separated,
 default empty) defines regular expression patterns to exclude from the build
 targets expanded from C<DH_GOLANG_BUILDPKG>.
 
+Please note that currently, the default is to only exclude pattern from the build target.
+(see C<DH_GOLANG_EXCLUDES_ALL> below)
+
 Example (in C<debian/rules>):
 
- # We want to ship only the library packages themselves, not the accompanying
+ # We want to build only the library packages themselves, not the accompanying
  # example binaries.
  export DH_GOLANG_EXCLUDES := examples/
+
+=item DH_GOLANG_EXCLUDES_ALL
+
+C<DH_GOLANG_EXCLUDES_ALL> (boolean, default currently to false) makes
+C<DH_GOLANG_EXCLUDE> excludes files not only during the building process but
+also for install.  This is useful, if, for instance, examples are installed
+with C<dh_installexamples>.  This might default to true in the future.
+
+Example (in C<debian/rules>):
+
+ # We want to ship only the library packages themselves in the go source, not
+ # the accompanying example binaries.
+ export DH_GOLANG_EXCLUDES := examples/
+ export DH_GOLANG_EXCLUDES_ALL := 1
 
 =item DH_GOLANG_GO_GENERATE
 
@@ -489,11 +506,39 @@ sub install {
     }
 
     if ($install_source) {
+        my @sourcefiles;
         # Path to the src/ directory within $destdir
         my $dest_src = "$destdir/usr/share/gocode/src/$ENV{DH_GOPKG}";
-        $this->doit_in_builddir('mkdir', '-p', $dest_src);
-        $this->doit_in_builddir('cp', '-r', '-T', "src/$ENV{DH_GOPKG}", $dest_src);
-    }
+
+        # defined separately to make it easy to change the default
+        my $exclude_all = (exists($ENV{DH_GOLANG_EXCLUDES_ALL}) ?
+                            $ENV{DH_GOLANG_EXCLUDES_ALL} : 0);
+
+        my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) && $exclude_all ?
+                        split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
+        find({
+        wanted => sub {
+            my $name = $File::Find::name;
+            for my $pattern (@excludes) {
+                verbose_print("checking $name against $pattern from DH_GOLANG_EXCLUDES\n");
+                if ($name =~ /$pattern/) {
+                    verbose_print("$name matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
+                    return;
+                }
+                unless (-f $name) {
+                    verbose_print("$name: no such file or directory");
+                    return;
+                }
+            }
+
+            my $dest = "$dstdir/$name";
+            make_path(dirname($dest));
+            verbose_print("Copy $name -> $dest");
+            copy($name, $dest) or error("Could not copy $name to $dest: $!");
+
+        },
+        no_chdir => 1,
+    }, "src/$ENV{DH_GOPKG}");
 }
 
 sub clean {
