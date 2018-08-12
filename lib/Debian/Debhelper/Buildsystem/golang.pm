@@ -518,23 +518,23 @@ sub install {
                         split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
         find({
         wanted => sub {
-            my $name = $File::Find::name;
+            my $source = $File::Find::name;
             for my $pattern (@excludes) {
-                verbose_print("checking $name against $pattern from DH_GOLANG_EXCLUDES\n");
-                if ($name =~ /$pattern/) {
-                    verbose_print("$name matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
+                verbose_print("checking $source against $pattern from DH_GOLANG_EXCLUDES\n");
+                if ($source =~ /$pattern/) {
+                    verbose_print("$source matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
                     return;
                 }
-                unless (-f $name) {
-                    verbose_print("$name: no such file or directory");
+                unless (-f $source) {
+                    verbose_print("$source: no such file or directory");
                     return;
                 }
             }
 
-            my $dest = "$dstdir/$name";
+            my $dest = "$dstdir/$source";
             make_path(dirname($dest));
-            verbose_print("Copy $name -> $dest");
-            copy($name, $dest) or error("Could not copy $name to $dest: $!");
+            verbose_print("Copy $source -> $dest");
+            copy($source, $dest) or error("Could not copy $source to $dest: $!");
 
         },
         no_chdir => 1,
