@@ -517,28 +517,28 @@ sub install {
         my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) && $exclude_all ?
                         split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
         find({
-        wanted => sub {
-            my $source = $File::Find::name;
-            for my $pattern (@excludes) {
-                verbose_print("checking $source against $pattern from DH_GOLANG_EXCLUDES\n");
-                if ($source =~ /$pattern/) {
-                    verbose_print("$source matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
-                    return;
+            wanted => sub {
+                my $source = $File::Find::name;
+                for my $pattern (@excludes) {
+                    verbose_print("checking $source against $pattern from DH_GOLANG_EXCLUDES\n");
+                    if ($source =~ /$pattern/) {
+                        verbose_print("$source matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
+                        return;
+                    }
+                    unless (-f $source) {
+                        verbose_print("$source: no such file or directory");
+                        return;
+                    }
                 }
-                unless (-f $source) {
-                    verbose_print("$source: no such file or directory");
-                    return;
-                }
-            }
 
-            my $dest = "$dstdir/$source";
-            make_path(dirname($dest));
-            verbose_print("Copy $source -> $dest");
-            copy($source, $dest) or error("Could not copy $source to $dest: $!");
+                my $dest = "$dstdir/$source";
+                make_path(dirname($dest));
+                verbose_print("Copy $source -> $dest");
+                copy($source, $dest) or error("Could not copy $source to $dest: $!");
 
-        },
-        no_chdir => 1,
-    }, "src/$ENV{DH_GOPKG}");
+            },
+            no_chdir => 1,
+        }, "src/$ENV{DH_GOPKG}");
 }
 
 sub clean {
