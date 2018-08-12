@@ -506,7 +506,6 @@ sub install {
     }
 
     if ($install_source) {
-        my @sourcefiles;
         # Path to the src/ directory within $destdir
         my $dest_src = "$destdir/usr/share/gocode/src/$ENV{DH_GOPKG}";
 
