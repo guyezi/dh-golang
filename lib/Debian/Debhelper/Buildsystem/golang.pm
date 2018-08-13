@@ -515,29 +515,42 @@ sub install {
 
         my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) && $exclude_all ?
                         split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
+
         find({
             wanted => sub {
                 my $source = $File::Find::name;
+                my $source_rel = File::Spec-> abs2rel($source, "$builddir/src/$ENV{DH_GOPKG}");
+
                 for my $pattern (@excludes) {
-                    verbose_print("checking $source against $pattern from DH_GOLANG_EXCLUDES\n");
-                    if ($source =~ /$pattern/) {
-                        verbose_print("$source matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
-                        return;
-                    }
-                    unless (-f $source) {
-                        verbose_print("$source: no such file or directory");
+                    verbose_print("checking $source_rel against $pattern from DH_GOLANG_EXCLUDES\n");
+                    if ($source_rel =~ /$pattern/) {
+                        verbose_print("$source_rel matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
                         return;
                     }
                 }
 
-                my $dest = "$dstdir/$source";
-                make_path(dirname($dest));
+                my $dest = "$dest_src/$source_rel";
+                my $destdir = dirname($dest);
+
+                return if (-e $dest);
+                return if (-d $source);
+                make_path($destdir) unless (-d $destdir);
+
+                # it's very unlikely there are symlinks. But just in case...
+                if (-l $source) {
+                    my $link_target = readlink($source);
+                    verbose_print("Create symlink $dest -> $link_target");
+                    symlink($link_target, $dest) or error("Could not create symlink $dest -> $link_target: $!");
+                    return
+                }
+
                 verbose_print("Copy $source -> $dest");
                 copy($source, $dest) or error("Could not copy $source to $dest: $!");
 
-            },
+                },
             no_chdir => 1,
-        }, "src/$ENV{DH_GOPKG}");
+            }, "$builddir/src/$ENV{DH_GOPKG}");
+    }
 }
 
 sub clean {
