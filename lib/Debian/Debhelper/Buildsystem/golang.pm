@@ -522,7 +522,6 @@ sub install {
                 my $source_rel = File::Spec-> abs2rel($source, "$builddir/src/$ENV{DH_GOPKG}");
 
                 for my $pattern (@excludes) {
-                    verbose_print("checking $source_rel against $pattern from DH_GOLANG_EXCLUDES\n");
                     if ($source_rel =~ /$pattern/) {
                         verbose_print("$source_rel matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
                         return;
