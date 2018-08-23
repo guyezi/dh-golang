@@ -173,8 +173,9 @@ C<DH_GOLANG_EXCLUDES> (list of Perl regular expressions, whitespace-separated,
 default empty) defines regular expression patterns to exclude from the build
 targets expanded from C<DH_GOLANG_BUILDPKG>.
 
-Please note that currently, the default is to only exclude pattern from the build target.
-(see C<DH_GOLANG_EXCLUDES_ALL> below)
+Please note that with DH_COMPAT level inferior or equal to 11, the default is
+to only exclude pattern from the build target.  (see C<DH_GOLANG_EXCLUDES_ALL>
+below)
 
 Example (in C<debian/rules>):
 
@@ -184,11 +185,12 @@ Example (in C<debian/rules>):
 
 =item DH_GOLANG_EXCLUDES_ALL
 
-C<DH_GOLANG_EXCLUDES_ALL> (boolean, default currently to false) makes
-C<DH_GOLANG_EXCLUDE> excludes files not only during the building process but
-also for install.  This is useful, if, for instance, examples are installed
-with C<dh_installexamples>.  This might default to true in the future.
-
+C<DH_GOLANG_EXCLUDES_ALL> (boolean, default to true starting from DH_COMPAT
+level 12) makes C<DH_GOLANG_EXCLUDE> excludes files not only during the
+building process but also for install.  This is useful, if, for instance,
+examples are installed with C<dh_installexamples>. If you only want to
+exclude files from the building process but keep them in the source, set this
+to false.
 Example (in C<debian/rules>):
 
  # We want to ship only the library packages themselves in the go source, not
@@ -509,9 +511,12 @@ sub install {
         # Path to the src/ directory within $destdir
         my $dest_src = "$destdir/usr/share/gocode/src/$ENV{DH_GOPKG}";
 
-        # defined separately to make it easy to change the default
+        # starting from compat level 12, exclude_all defaults to True
+        my $exclude_all_default = (compat(11) ?
+                                0 : 1);
+
         my $exclude_all = (exists($ENV{DH_GOLANG_EXCLUDES_ALL}) ?
-                            $ENV{DH_GOLANG_EXCLUDES_ALL} : 0);
+                            $ENV{DH_GOLANG_EXCLUDES_ALL} : $exclude_all_default);
 
         my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) && $exclude_all ?
                         split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
