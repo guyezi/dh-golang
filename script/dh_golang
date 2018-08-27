@@ -78,6 +78,12 @@ my @godeps = exec_single(qq{go list -f '$tmpl'}, @targets);
 
 my $gofiletmpl = '\
 {{ .Dir }}/{{ index (or .GoFiles .CgoFiles .TestGoFiles .XTestGoFiles .IgnoredGoFiles) 0 }}';
+
+# gccgo can't find files for standard libraries, see #907263
+if (grep /gccgo/, exec_single(q{go version})) {
+    $gofiletmpl = '{{if not .Standard}}' . $gofiletmpl . '{{end}}';
+}
+
 my @gofiles = exec_chunked(qq{go list -f '$gofiletmpl'}, uniq(@godeps));
 
 my @realpath;
