@@ -1,7 +1,7 @@
 Source: dh-golang
 Section: devel
 Priority: optional
-Maintainer: Debian Go Packaging Team <pkg-go-maintainers@lists.alioth.debian.org>
+Maintainer: Debian Go Packaging Team <team+pkg-go@tracker.debian.org>
 Uploaders: Michael Stapelberg <stapelberg@debian.org>,
            Martín Ferrari <tincho@debian.org>,
 Build-Depends: debhelper (>= 10), libmodule-install-perl
