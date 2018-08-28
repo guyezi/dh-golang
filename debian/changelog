@@ -1,8 +1,19 @@
-dh-golang (1.35) UNRELEASED; urgency=medium
+dh-golang (1.35) unstable; urgency=medium
 
+  * Team upload.
+
+  [ Alexandre Viau ]
   * Point Vcs-* urls to salsa.debian.org.
 
- -- Alexandre Viau <aviau@debian.org>  Mon, 02 Apr 2018 12:58:54 -0400
+  [ Arnaud Rebillout ]
+  * Mention that DH_GOPKG is not set in debian/rules.
+
+  [ Shengjing Zhu ]
+  * Update Standards-Version to 4.2.1. (no changes)
+  * Update team mail address to tracker.debian.org.
+  * Fix index out of range when using gccgo. (Closes: #907263)
+
+ -- Shengjing Zhu <i@zhsj.me>  Tue, 28 Aug 2018 22:03:23 +0800
 
 dh-golang (1.34) unstable; urgency=medium
 
