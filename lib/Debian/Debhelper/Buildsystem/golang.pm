@@ -127,8 +127,8 @@ very hard to parse.
 C<DH_GOLANG_INSTALL_EXTRA> (list of strings, whitespace-separated, default
 empty) enumerates files and directories which are additionally installed into
 the build directory. By default, only files with the following extension are
-installed: .go, .c, .cc, .h, .hh, .proto, .s. Starting with dh-golang 1.31,
-testdata directory contents are installed by default.
+installed: .go, .c, .cc, .cpp, .h, .hh, hpp, .proto, .s. Starting with dh-golang
+1.31, testdata directory contents are installed by default.
 
 Example (in C<debian/rules>):
 
@@ -138,8 +138,8 @@ Example (in C<debian/rules>):
 
 C<DH_GOLANG_INSTALL_ALL> (bool, default false) controls whether all files are
 installed into the build directory. By default, only files with the following
-extension are installed: .go, .c, .cc, .h, .hh, .proto, .s. Starting with
-dh-golang 1.31, testdata directory contents are installed by default.
+extension are installed: .go, .c, .cc, .cpp, .h, .hh, .hpp, .proto, .s. Starting
+with dh-golang 1.31, testdata directory contents are installed by default.
 
 Example (in C<debian/rules>):
 
@@ -340,8 +340,10 @@ sub configure {
         '.go' => 1,
         '.c' => 1,
         '.cc' => 1,
+        '.cpp' => 1,
         '.h' => 1,
         '.hh' => 1,
+        '.hpp' => 1,
         '.proto' => 1,
         '.s' => 1,
     );
