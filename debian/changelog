@@ -13,6 +13,11 @@ dh-golang (1.35) unstable; urgency=medium
   * Update team mail address to tracker.debian.org.
   * Fix index out of range when using gccgo. (Closes: #907263)
 
+  [ Clément Hermann ]
+  * Add DH_GOLANG_EXCLUDES_ALL to exclude files from installation
+    as well as build process. Default to true starting from compat
+    level 12. (Closes: #904261)
+
  -- Shengjing Zhu <i@zhsj.me>  Tue, 28 Aug 2018 22:03:23 +0800
 
 dh-golang (1.34) unstable; urgency=medium
