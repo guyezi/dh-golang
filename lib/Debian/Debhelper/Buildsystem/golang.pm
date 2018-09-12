@@ -173,11 +173,30 @@ C<DH_GOLANG_EXCLUDES> (list of Perl regular expressions, whitespace-separated,
 default empty) defines regular expression patterns to exclude from the build
 targets expanded from C<DH_GOLANG_BUILDPKG>.
 
+Please note that with DH_COMPAT level inferior or equal to 11, the default is
+to only exclude pattern from the build target.  (see C<DH_GOLANG_EXCLUDES_ALL>
+below)
+
 Example (in C<debian/rules>):
 
- # We want to ship only the library packages themselves, not the accompanying
+ # We want to build only the library packages themselves, not the accompanying
  # example binaries.
  export DH_GOLANG_EXCLUDES := examples/
+
+=item DH_GOLANG_EXCLUDES_ALL
+
+C<DH_GOLANG_EXCLUDES_ALL> (boolean, default to true starting from DH_COMPAT
+level 12) makes C<DH_GOLANG_EXCLUDE> excludes files not only during the
+building process but also for install.  This is useful, if, for instance,
+examples are installed with C<dh_installexamples>. If you only want to
+exclude files from the building process but keep them in the source, set this
+to false.
+Example (in C<debian/rules>):
+
+ # We want to ship only the library packages themselves in the go source, not
+ # the accompanying example binaries.
+ export DH_GOLANG_EXCLUDES := examples/
+ export DH_GOLANG_EXCLUDES_ALL := 1
 
 =item DH_GOLANG_GO_GENERATE
 
@@ -491,8 +510,50 @@ sub install {
     if ($install_source) {
         # Path to the src/ directory within $destdir
         my $dest_src = "$destdir/usr/share/gocode/src/$ENV{DH_GOPKG}";
-        $this->doit_in_builddir('mkdir', '-p', $dest_src);
-        $this->doit_in_builddir('cp', '-r', '-T', "src/$ENV{DH_GOPKG}", $dest_src);
+
+        # starting from compat level 12, exclude_all defaults to True
+        my $exclude_all_default = (compat(11) ?
+                                0 : 1);
+
+        my $exclude_all = (exists($ENV{DH_GOLANG_EXCLUDES_ALL}) ?
+                            $ENV{DH_GOLANG_EXCLUDES_ALL} : $exclude_all_default);
+
+        my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) && $exclude_all ?
+                        split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
+
+        find({
+            wanted => sub {
+                my $source = $File::Find::name;
+                my $source_rel = File::Spec-> abs2rel($source, "$builddir/src/$ENV{DH_GOPKG}");
+
+                for my $pattern (@excludes) {
+                    if ($source_rel =~ /$pattern/) {
+                        verbose_print("$source_rel matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
+                        return;
+                    }
+                }
+
+                my $dest = "$dest_src/$source_rel";
+                my $destdir = dirname($dest);
+
+                return if (-e $dest);
+                return if (-d $source);
+                make_path($destdir) unless (-d $destdir);
+
+                # it's very unlikely there are symlinks. But just in case...
+                if (-l $source) {
+                    my $link_target = readlink($source);
+                    verbose_print("Create symlink $dest -> $link_target");
+                    symlink($link_target, $dest) or error("Could not create symlink $dest -> $link_target: $!");
+                    return
+                }
+
+                verbose_print("Copy $source -> $dest");
+                copy($source, $dest) or error("Could not copy $source to $dest: $!");
+
+                },
+            no_chdir => 1,
+            }, "$builddir/src/$ENV{DH_GOPKG}");
     }
 }
 
