@@ -1,11 +1,11 @@
-dh-golang (1.36) UNRELEASED; urgency=medium
+dh-golang (1.36) unstable; urgency=medium
 
   [ Clément Hermann ]
   * Add DH_GOLANG_EXCLUDES_ALL to exclude files from installation
     as well as build process. Default to true starting from compat
     level 12. (Closes: #904261)
 
- -- Martín Ferrari <tincho@debian.org>  Fri, 14 Sep 2018 15:25:46 +0000
+ -- Martín Ferrari <tincho@debian.org>  Fri, 14 Sep 2018 15:40:15 +0000
 
 dh-golang (1.35) unstable; urgency=medium
 
