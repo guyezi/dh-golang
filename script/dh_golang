@@ -54,8 +54,8 @@ sub exec_chunked {
     my ($cmd, @list) = @_;
 
     my @result;
-    for (my $i = 0; $i < @list; $i += CHUNKSIZE) {
-        push @result, exec_single($cmd, splice(@list, $i, CHUNKSIZE));
+    while (@list) {
+        push @result, exec_single($cmd, splice(@list, 0, CHUNKSIZE));
     }
 
     return @result;
