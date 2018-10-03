@@ -243,7 +243,7 @@ use strict;
 use base 'Debian::Debhelper::Buildsystem';
 use Debian::Debhelper::Dh_Lib;
 use Dpkg::Control::Info;
-use File::Copy; # in core since 5.002
+use File::Copy "cp"; # in core since 5.002
 use File::Path qw(make_path); # in core since 5.001
 use File::Find; # in core since 5
 use File::Spec; # in core since 5.00405
@@ -413,7 +413,7 @@ sub configure {
 
         make_path(dirname($dest));
         verbose_print("Copy $source -> $dest");
-        copy($source, $dest) or error("Could not copy $source to $dest: $!");
+        cp($source, $dest) or error("Could not copy $source to $dest: $!");
     }
 
     ############################################################################
@@ -551,7 +551,7 @@ sub install {
                 }
 
                 verbose_print("Copy $source -> $dest");
-                copy($source, $dest) or error("Could not copy $source to $dest: $!");
+                cp($source, $dest) or error("Could not copy $source to $dest: $!");
 
                 },
             no_chdir => 1,
