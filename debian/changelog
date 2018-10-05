@@ -1,3 +1,10 @@
+dh-golang (1.37) unstable; urgency=medium
+
+  * Team upload.
+  * Use "cp" instead of "copy" so permissions are preserved (Closes: #910125)
+
+ -- Stephen Gelman <ssgelm@debian.org>  Thu, 04 Oct 2018 20:24:11 -0500
+
 dh-golang (1.36) unstable; urgency=medium
 
   [ Clément Hermann ]
