@@ -3,6 +3,12 @@ dh-golang (1.37) unstable; urgency=medium
   * Team upload.
   * Use "cp" instead of "copy" so permissions are preserved (Closes: #910125)
 
+  [ Shengjing Zhu ]
+  * Fix exec_chunked not iterating over all elements. (Closes: #909787)
+
+  [ Hilko Bengen ]
+  * Copy files with .cpp, .hpp suffixes by default. (Closes: #908679)
+
  -- Stephen Gelman <ssgelm@debian.org>  Thu, 04 Oct 2018 20:24:11 -0500
 
 dh-golang (1.36) unstable; urgency=medium
