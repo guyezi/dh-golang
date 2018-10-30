@@ -462,7 +462,7 @@ sub build {
     }
     unshift @_, ('-p', $this->get_parallel());
     # Go 1.10 changed flag behaviour, -{gc,asm}flags=all= only works for Go >= 1.10.
-    my $trimpath = "\"all=-trimpath=" . $ENV{GOPATH} . "/src\"";
+    my $trimpath = "all=\"-trimpath=" . $ENV{GOPATH} . "/src\"";
     $this->doit_in_builddir("go", "install", "-gcflags=$trimpath", "-asmflags=$trimpath", "-v", @_, get_targets());
 }
 
