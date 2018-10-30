@@ -1,3 +1,14 @@
+dh-golang (1.38) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Félix Sipma ]
+  * Build with '-{gc,asm}flags=all=-trimpath=' for reproducibility.
+    Thanks, Alexander Neumann.
+    see https://github.com/restic/restic/issues/2061
+
+ -- Shengjing Zhu <zhsj@debian.org>  Tue, 30 Oct 2018 11:23:16 +0800
+
 dh-golang (1.37) unstable; urgency=medium
 
   * Team upload.
