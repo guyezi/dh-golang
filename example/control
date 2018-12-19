@@ -1,16 +1,19 @@
 Source: dcs
-Section: net
-Priority: extra
+Section: devel
+Priority: optional
+Maintainer: Debian Go Packaging Team <team+pkg-go@tracker.debian.org>
 Maintainer: Michael Stapelberg <stapelberg@debian.org>
-Build-Depends: debhelper (>= 8.0.0),
+Build-Depends: debhelper (>= 11),
                dh-golang,
+               golang-any,
                golang-pq-dev,
-               golang-go,
                golang-godebiancontrol-dev,
                golang-codesearch-dev
-Standards-Version: 3.9.2
-#Vcs-Git: git://git.debian.org/collab-maint/dcs.git
-#Vcs-Browser: http://git.debian.org/?p=collab-maint/dcs.git;a=summary
+Standards-Version: 4.2.1
+XS-Go-Import-Path: github.com/Debian/dcs
+Vcs-Browser: https://salsa.debian.org/go-team/packages/dcs
+Vcs-Git: https://salsa.debian.org/go-team/packages/dcs.git
+Testsuite: autopkgtest-pkg-go
 
 Package: dcs
 Architecture: any

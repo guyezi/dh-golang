@@ -2,7 +2,5 @@
 
 export DH_OPTIONS
 
-export DH_GOPKG := github.com/Debian/dcs
-
 %:
 	dh $@ --buildsystem=golang --with=golang
