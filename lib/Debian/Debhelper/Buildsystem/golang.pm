@@ -367,9 +367,9 @@ sub configure {
             my $name = substr($File::Find::name, 2);
             if ($install_all) {
                 # All files will be installed
-	    } elsif ((grep { $_ eq "testdata" } File::Spec->splitdir($File::Find::dir)) > 0) {
-		# The go tool treats testdata directories as special, so install
-		# their contents by default.
+            } elsif ((grep { $_ eq "testdata" } File::Spec->splitdir($File::Find::dir)) > 0) {
+                # The go tool treats testdata directories as special,
+                # so install their contents by default.
             } else {
                 my $dot = rindex($name, ".");
                 return if $dot == -1;
