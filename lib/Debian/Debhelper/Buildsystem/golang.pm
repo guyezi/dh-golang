@@ -295,6 +295,16 @@ sub _set_gocache {
     $ENV{GOCACHE} = "off";
 }
 
+sub _set_go111module {
+    # Honor the user’s wishes if GO111MODULE was explicitly set.
+    return if defined($ENV{GO111MODULE}) && $ENV{GO111MODULE} ne '';
+
+    # Operate in "GOPATH mode" by default for "minimal module compatibility",
+    # otherwise Go >= 1.11 would attempt to check module information on-line.
+    # See https://github.com/golang/go/wiki/Modules
+    $ENV{GO111MODULE} = "off";
+}
+
 sub _link_contents {
     my ($src, $dst) = @_;
 
@@ -457,6 +467,7 @@ sub build {
 
     $this->_set_gopath();
     $this->_set_gocache();
+    $this->_set_go111module();
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
@@ -471,6 +482,7 @@ sub test {
 
     $this->_set_gopath();
     $this->_set_gocache();
+    $this->_set_go111module();
     unshift @_, ('-p', $this->get_parallel());
     # Go 1.10 started calling “go vet” when running “go test”. This breaks tests
     # of many not-yet-fixed upstream packages, so we disable it for the time
