@@ -1,3 +1,22 @@
+dh-golang (1.39) unstable; urgency=medium
+
+  * Team upload.
+
+  [ Michael Stapelberg ]
+  * Update example to match dh-make-golang github.com/Debian/dcs output
+
+  [ Anthony Fok ]
+  * Fix indentation in elsif block for installation of testdata/ content
+  * Set GO111MODULE to off (unless explicitly specified)
+    to operate in "GOPATH mode" by default for "minimal module compatibility",
+    otherwise Go >= 1.11 would attempt to check module information on-line,
+    leading to build failure.  See https://github.com/golang/go/wiki/Modules
+  * Install go.mod and go.sum by default for v2+ module support
+  * Set GOCACHE and GO111MODULE to off in dh_golang too
+  * Bump Standards-Version to 4.3.0 (no change)
+
+ -- Anthony Fok <foka@debian.org>  Sat, 29 Dec 2018 18:00:34 -0700
+
 dh-golang (1.38) unstable; urgency=medium
 
   * Team upload.
