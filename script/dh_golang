@@ -69,6 +69,8 @@ buildsystems_init();
 my $bs = load_buildsystem("golang");
 
 $bs->_set_gopath();
+$bs->_set_gocache();
+$bs->_set_go111module();
 
 my @targets = $bs->get_targets();
 
