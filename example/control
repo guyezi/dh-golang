@@ -3,6 +3,7 @@ Section: devel
 Priority: optional
 Maintainer: Debian Go Packaging Team <team+pkg-go@tracker.debian.org>
 Uploaders: Michael Stapelberg <stapelberg@debian.org>,
+Rules-Requires-Root: no
 Build-Depends: debhelper-compat (= 12),
                dh-golang,
                golang-any,

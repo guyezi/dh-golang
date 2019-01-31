@@ -5,6 +5,7 @@ Uploaders: Michael Stapelberg <stapelberg@debian.org>,
            Anthony Fok <foka@debian.org>,
 Section: devel
 Priority: optional
+Rules-Requires-Root: no
 Build-Depends: debhelper-compat (= 12),
                libmodule-install-perl,
 Standards-Version: 4.4.0
