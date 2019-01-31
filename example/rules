@@ -3,4 +3,4 @@
 export DH_OPTIONS
 
 %:
-	dh $@ --buildsystem=golang --with=golang
+	dh $@ --builddirectory=_build --buildsystem=golang --with=golang

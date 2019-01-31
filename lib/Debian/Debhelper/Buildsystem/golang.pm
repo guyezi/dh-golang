@@ -10,7 +10,7 @@ The dh-golang package provides a build system for debhelper which can be used in
 the following way:
 
  %:
- 	dh $@ --buildsystem=golang --with=golang
+ 	dh $@ --builddirectory=_build --buildsystem=golang --with=golang
 
 =head1 IMPLEMENTATION
 
