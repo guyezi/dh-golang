@@ -9,7 +9,7 @@ Build-Depends: debhelper (>= 11),
                golang-codesearch-dev,
                golang-godebiancontrol-dev,
                golang-pq-dev,
-Standards-Version: 4.2.1
+Standards-Version: 4.4.0
 XS-Go-Import-Path:
  github.com/Debian/dcs,
 Vcs-Browser: https://salsa.debian.org/go-team/packages/dcs
