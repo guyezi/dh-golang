@@ -281,7 +281,8 @@ sub _set_dh_gopkg {
     #                             gopkg.in/mgo.v2,
     #                             labix.org/v2/mgo,
     #                             launchpad.net/mgo
-    $ENV{DH_GOPKG} = (split ",", $source->{"XS-Go-Import-Path"})[0];
+    my $import = $source->{"XS-Go-Import-Path"} =~ s/\n/ /gr;
+    $ENV{DH_GOPKG} = (split ",", $import)[0];
 }
 
 sub _set_gopath {
