@@ -54,8 +54,8 @@ sub exec_chunked {
     my ($cmd, @list) = @_;
 
     my @result;
-    for (my $i = 0; $i < @list; $i += CHUNKSIZE) {
-        push @result, exec_single($cmd, splice(@list, $i, CHUNKSIZE));
+    while (@list) {
+        push @result, exec_single($cmd, splice(@list, 0, CHUNKSIZE));
     }
 
     return @result;
@@ -69,6 +69,8 @@ buildsystems_init();
 my $bs = load_buildsystem("golang");
 
 $bs->_set_gopath();
+$bs->_set_gocache();
+$bs->_set_go111module();
 
 my @targets = $bs->get_targets();
 
@@ -78,6 +80,12 @@ my @godeps = exec_single(qq{go list -f '$tmpl'}, @targets);
 
 my $gofiletmpl = '\
 {{ .Dir }}/{{ index (or .GoFiles .CgoFiles .TestGoFiles .XTestGoFiles .IgnoredGoFiles) 0 }}';
+
+# gccgo can't find files for standard libraries, see #907263
+if (grep /gccgo/, exec_single(q{go version})) {
+    $gofiletmpl = '{{if not .Standard}}' . $gofiletmpl . '{{end}}';
+}
+
 my @gofiles = exec_chunked(qq{go list -f '$gofiletmpl'}, uniq(@godeps));
 
 my @realpath;

@@ -107,6 +107,14 @@ Example (in C<debian/control>):
                     labix.org/v2/mgo,
                     launchpad.net/mgo
 
+C<DH_GOPKG> is set by dh-golang, and as a consequence it is not present in the
+C<debian/rules> environment. If you need to use the Go package name in the
+C<debian/rules> file, you must define it yourself.
+
+Example (in C<debian/rules>):
+
+ export DH_GOPKG := github.com/go-mgo/mgo
+
 Historical note: before the C<XS-Go-Import-Path> field was introduced, we used
 to set C<DH_GOPKG> in C<debian/rules>. When you encounter such a package, please
 convert it by moving the value from C<debian/rules> to C<debian/control>. It is
@@ -119,8 +127,10 @@ very hard to parse.
 C<DH_GOLANG_INSTALL_EXTRA> (list of strings, whitespace-separated, default
 empty) enumerates files and directories which are additionally installed into
 the build directory. By default, only files with the following extension are
-installed: .go, .c, .cc, .h, .hh, .proto, .s. Starting with dh-golang 1.31,
-testdata directory contents are installed by default.
+installed: .go, .c, .cc, .cpp, .h, .hh, hpp, .proto, .s. Starting with dh-golang
+1.31, testdata directory contents are installed by default.
+Starting with dh-golang 1.39, go.mod and go.sum are installed by default
+to support Go 1.11 modules.
 
 Example (in C<debian/rules>):
 
@@ -130,8 +140,10 @@ Example (in C<debian/rules>):
 
 C<DH_GOLANG_INSTALL_ALL> (bool, default false) controls whether all files are
 installed into the build directory. By default, only files with the following
-extension are installed: .go, .c, .cc, .h, .hh, .proto, .s. Starting with
-dh-golang 1.31, testdata directory contents are installed by default.
+extension are installed: .go, .c, .cc, .cpp, .h, .hh, .hpp, .proto, .s. Starting
+with dh-golang 1.31, testdata directory contents are installed by default.
+Starting with dh-golang 1.39, go.mod and go.sum are installed by default
+to support Go 1.11 modules.
 
 Example (in C<debian/rules>):
 
@@ -165,11 +177,30 @@ C<DH_GOLANG_EXCLUDES> (list of Perl regular expressions, whitespace-separated,
 default empty) defines regular expression patterns to exclude from the build
 targets expanded from C<DH_GOLANG_BUILDPKG>.
 
+Please note that with DH_COMPAT level inferior or equal to 11, the default is
+to only exclude pattern from the build target.  (see C<DH_GOLANG_EXCLUDES_ALL>
+below)
+
 Example (in C<debian/rules>):
 
- # We want to ship only the library packages themselves, not the accompanying
+ # We want to build only the library packages themselves, not the accompanying
  # example binaries.
  export DH_GOLANG_EXCLUDES := examples/
+
+=item DH_GOLANG_EXCLUDES_ALL
+
+C<DH_GOLANG_EXCLUDES_ALL> (boolean, default to true starting from DH_COMPAT
+level 12) makes C<DH_GOLANG_EXCLUDE> excludes files not only during the
+building process but also for install.  This is useful, if, for instance,
+examples are installed with C<dh_installexamples>. If you only want to
+exclude files from the building process but keep them in the source, set this
+to false.
+Example (in C<debian/rules>):
+
+ # We want to ship only the library packages themselves in the go source, not
+ # the accompanying example binaries.
+ export DH_GOLANG_EXCLUDES := examples/
+ export DH_GOLANG_EXCLUDES_ALL := 1
 
 =item DH_GOLANG_GO_GENERATE
 
@@ -216,7 +247,7 @@ use strict;
 use base 'Debian::Debhelper::Buildsystem';
 use Debian::Debhelper::Dh_Lib;
 use Dpkg::Control::Info;
-use File::Copy; # in core since 5.002
+use File::Copy "cp"; # in core since 5.002
 use File::Path qw(make_path); # in core since 5.001
 use File::Find; # in core since 5
 use File::Spec; # in core since 5.00405
@@ -268,6 +299,16 @@ sub _set_gocache {
     $ENV{GOCACHE} = "off";
 }
 
+sub _set_go111module {
+    # Honor the user’s wishes if GO111MODULE was explicitly set.
+    return if defined($ENV{GO111MODULE}) && $ENV{GO111MODULE} ne '';
+
+    # Operate in "GOPATH mode" by default for "minimal module compatibility",
+    # otherwise Go >= 1.11 would attempt to check module information on-line.
+    # See https://github.com/golang/go/wiki/Modules
+    $ENV{GO111MODULE} = "off";
+}
+
 sub _link_contents {
     my ($src, $dst) = @_;
 
@@ -313,8 +354,10 @@ sub configure {
         '.go' => 1,
         '.c' => 1,
         '.cc' => 1,
+        '.cpp' => 1,
         '.h' => 1,
         '.hh' => 1,
+        '.hpp' => 1,
         '.proto' => 1,
         '.s' => 1,
     );
@@ -338,9 +381,12 @@ sub configure {
             my $name = substr($File::Find::name, 2);
             if ($install_all) {
                 # All files will be installed
-	    } elsif ((grep { $_ eq "testdata" } File::Spec->splitdir($File::Find::dir)) > 0) {
-		# The go tool treats testdata directories as special, so install
-		# their contents by default.
+            } elsif ((grep { $_ eq "testdata" } File::Spec->splitdir($File::Find::dir)) > 0) {
+                # The go tool treats testdata directories as special,
+                # so install their contents by default.
+            } elsif ($name eq 'go.mod' or $name eq 'go.sum') {
+                # The go.mod file is mandatory for Go programs which require
+                # v2+ modules.  See https://github.com/golang/go/wiki/Modules
             } else {
                 my $dot = rindex($name, ".");
                 return if $dot == -1;
@@ -384,7 +430,7 @@ sub configure {
 
         make_path(dirname($dest));
         verbose_print("Copy $source -> $dest");
-        copy($source, $dest) or error("Could not copy $source to $dest: $!");
+        cp($source, $dest) or error("Could not copy $source to $dest: $!");
     }
 
     ############################################################################
@@ -428,11 +474,13 @@ sub build {
 
     $this->_set_gopath();
     $this->_set_gocache();
+    $this->_set_go111module();
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
     unshift @_, ('-p', $this->get_parallel());
-    my $trimpath = "\"-trimpath=" . $ENV{GOPATH} . "/src\"";
+    # Go 1.10 changed flag behaviour, -{gc,asm}flags=all= only works for Go >= 1.10.
+    my $trimpath = "all=\"-trimpath=" . $ENV{GOPATH} . "/src\"";
     $this->doit_in_builddir("go", "install", "-gcflags=$trimpath", "-asmflags=$trimpath", "-v", @_, get_targets());
 }
 
@@ -441,6 +489,7 @@ sub test {
 
     $this->_set_gopath();
     $this->_set_gocache();
+    $this->_set_go111module();
     unshift @_, ('-p', $this->get_parallel());
     # Go 1.10 started calling “go vet” when running “go test”. This breaks tests
     # of many not-yet-fixed upstream packages, so we disable it for the time
@@ -483,8 +532,50 @@ sub install {
     if ($install_source) {
         # Path to the src/ directory within $destdir
         my $dest_src = "$destdir/usr/share/gocode/src/$ENV{DH_GOPKG}";
-        $this->doit_in_builddir('mkdir', '-p', $dest_src);
-        $this->doit_in_builddir('cp', '-r', '-T', "src/$ENV{DH_GOPKG}", $dest_src);
+
+        # starting from compat level 12, exclude_all defaults to True
+        my $exclude_all_default = (compat(11) ?
+                                0 : 1);
+
+        my $exclude_all = (exists($ENV{DH_GOLANG_EXCLUDES_ALL}) ?
+                            $ENV{DH_GOLANG_EXCLUDES_ALL} : $exclude_all_default);
+
+        my @excludes = (exists($ENV{DH_GOLANG_EXCLUDES}) && $exclude_all ?
+                        split(/ /, $ENV{DH_GOLANG_EXCLUDES}) : ());
+
+        find({
+            wanted => sub {
+                my $source = $File::Find::name;
+                my $source_rel = File::Spec-> abs2rel($source, "$builddir/src/$ENV{DH_GOPKG}");
+
+                for my $pattern (@excludes) {
+                    if ($source_rel =~ /$pattern/) {
+                        verbose_print("$source_rel matches $pattern from DH_GOLANG_EXCLUDES, skipping\n");
+                        return;
+                    }
+                }
+
+                my $dest = "$dest_src/$source_rel";
+                my $destdir = dirname($dest);
+
+                return if (-e $dest);
+                return if (-d $source);
+                make_path($destdir) unless (-d $destdir);
+
+                # it's very unlikely there are symlinks. But just in case...
+                if (-l $source) {
+                    my $link_target = readlink($source);
+                    verbose_print("Create symlink $dest -> $link_target");
+                    symlink($link_target, $dest) or error("Could not create symlink $dest -> $link_target: $!");
+                    return
+                }
+
+                verbose_print("Copy $source -> $dest");
+                cp($source, $dest) or error("Could not copy $source to $dest: $!");
+
+                },
+            no_chdir => 1,
+            }, "$builddir/src/$ENV{DH_GOPKG}");
     }
 }
 

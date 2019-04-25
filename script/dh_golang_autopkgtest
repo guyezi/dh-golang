@@ -113,7 +113,7 @@ if [ -e "/usr/share/gocode/src/$IMP_PATH" ]; then
     add_configure_override
 else
     libpkgs=$(perl -w -MDpkg::Control::Info -e '
-        foreach (Dpkg::Control::Info->new()->get_packages()) { 
+        foreach (Dpkg::Control::Info->new()->get_packages()) {
             my $pkg = $_->{"Package"};
             print $pkg if($pkg =~ /^golang-.*-dev$/);
         }')
