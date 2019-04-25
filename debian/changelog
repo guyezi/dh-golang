@@ -1,3 +1,9 @@
+dh-golang (1.39~bpo9+1) stretch-backports; urgency=medium
+
+  * Rebuild for stretch-backports.
+
+ -- Martín Ferrari <tincho@debian.org>  Thu, 25 Apr 2019 15:05:56 +0000
+
 dh-golang (1.39) unstable; urgency=medium
 
   * Team upload.
