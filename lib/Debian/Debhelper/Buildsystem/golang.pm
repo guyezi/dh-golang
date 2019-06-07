@@ -314,6 +314,55 @@ sub _set_goproxy {
     $ENV{GOPROXY} = "off";
 }
 
+my %GOOS_MAPPING = (
+    'linux' => 'linux',
+);
+my %GOARCH_MAPPING = (
+    'amd64/base'     => {'GOARCH' => 'amd64'},
+    'amd64/x32'      => {'GOARCH' => 'amd64p32'},
+    'arm/eabi'       => {'GOARCH' => 'arm', 'GOARM' => '5'},
+    'arm/eabihf'     => {'GOARCH' => 'arm', 'GOARM' => '7'},
+    'arm64/base'     => {'GOARCH' => 'arm64'},
+    'i386/base'      => {'GOARCH' => '386'},
+    'mips/base'      => {'GOARCH' => 'mips'},
+    'mips64/abi64'   => {'GOARCH' => 'mips64'},
+    'mips64el/abi64' => {'GOARCH' => 'mips64le'},
+    'mipsel/base'    => {'GOARCH' => 'mipsle'},
+    'powerpc/base'   => {'GOARCH' => 'ppc'},
+    'ppc64/base'     => {'GOARCH' => 'ppc64'},
+    'ppc64el/base'   => {'GOARCH' => 'ppc64le'},
+    'riscv64/base'   => {'GOARCH' => 'riscv64'},
+    's390/base'      => {'GOARCH' => 's390'},
+    's390x/base'     => {'GOARCH' => 's390x'},
+    'sparc/base'     => {'GOARCH' => 'sparc'},
+    'sparc64/base'   => {'GOARCH' => 'sparc64'},
+);
+
+sub _set_gocross {
+    return unless is_cross_compiling();
+
+    unless ($ENV{CC}) {
+        $ENV{CC} = dpkg_architecture_value("DEB_HOST_GNU_TYPE") . "-gcc";
+    }
+
+    $ENV{CGO_ENABLED} = "1";
+
+    my $host_os = dpkg_architecture_value("DEB_HOST_ARCH_OS");
+    if (defined(my $goos = $GOOS_MAPPING{$host_os})) {
+        $ENV{GOOS} = $goos;
+    } else {
+        error("Cannot cross-compile: Missing entry for HOST OS ${host_os}.");
+    }
+
+    my $host_cpu_abi = dpkg_architecture_value("DEB_HOST_ARCH_CPU") . "/" .
+                       dpkg_architecture_value("DEB_HOST_ARCH_ABI");
+    if (defined(my $cpu_vars = $GOARCH_MAPPING{$host_cpu_abi})) {
+        @ENV{keys %{$cpu_vars}} = @{$cpu_vars}{keys %{$cpu_vars}};
+    } else {
+        error("Cannot cross-compile: Missing entry for CPU/ABI ${host_cpu_abi}.");
+    }
+}
+
 sub _link_contents {
     my ($src, $dst) = @_;
 
@@ -481,6 +530,7 @@ sub build {
     $this->_set_gocache();
     $this->_set_go111module();
     $this->_set_goproxy();
+    $this->_set_gocross();
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
@@ -533,7 +583,12 @@ sub install {
     my @binaries = glob "$builddir/bin/*";
     if ($install_binaries and @binaries > 0) {
         $this->doit_in_builddir('mkdir', '-p', "$destdir/usr");
-        $this->doit_in_builddir('cp', '-r', 'bin', "$destdir/usr");
+        if (is_cross_compiling()) {
+            $this->_set_gocross();
+            $this->doit_in_builddir('cp', '-r', '-T', "bin/$ENV{GOOS}_$ENV{GOARCH}", "$destdir/usr/bin");
+        } else {
+            $this->doit_in_builddir('cp', '-r', 'bin', "$destdir/usr");
+        }
     }
 
     if ($install_source) {
