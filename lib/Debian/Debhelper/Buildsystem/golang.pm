@@ -306,6 +306,13 @@ sub _set_go111module {
     $ENV{GO111MODULE} = "off";
 }
 
+sub _set_goproxy {
+    return if defined($ENV{GOPROXY}) && $ENV{GOPROXY} ne '';
+
+    # Disallow network access.
+    $ENV{GOPROXY} = "off";
+}
+
 sub _link_contents {
     my ($src, $dst) = @_;
 
@@ -472,6 +479,7 @@ sub build {
     $this->_set_gopath();
     $this->_set_gocache();
     $this->_set_go111module();
+    $this->_set_goproxy();
     if (exists($ENV{DH_GOLANG_GO_GENERATE}) && $ENV{DH_GOLANG_GO_GENERATE} == 1) {
         $this->doit_in_builddir("go", "generate", "-v", @_, get_targets());
     }
@@ -487,6 +495,7 @@ sub test {
     $this->_set_gopath();
     $this->_set_gocache();
     $this->_set_go111module();
+    $this->_set_goproxy();
     unshift @_, ('-p', $this->get_parallel());
     # Go 1.10 started calling “go vet” when running “go test”. This breaks tests
     # of many not-yet-fixed upstream packages, so we disable it for the time
