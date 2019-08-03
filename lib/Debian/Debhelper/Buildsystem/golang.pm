@@ -290,17 +290,14 @@ sub _set_gopath {
 }
 
 sub _set_gocache {
-    # Honor the user’s wishes if GOCACHE was explicitly set, e.g. for speeding
-    # up builds/tests during local package development.
     return if defined($ENV{GOCACHE}) && $ENV{GOCACHE} ne '';
 
-    # Explicitly setting the cache to off suppresses an error message when
-    # building with sbuild, where the default cache location is not writeable.
-    $ENV{GOCACHE} = "off";
+    # Set GOCACHE to a directory where the go command can safely write to.
+    my $this = shift;
+    $ENV{GOCACHE} = $this->{cwd} . '/' . $this->get_builddir() . '/go-build'
 }
 
 sub _set_go111module {
-    # Honor the user’s wishes if GO111MODULE was explicitly set.
     return if defined($ENV{GO111MODULE}) && $ENV{GO111MODULE} ne '';
 
     # Operate in "GOPATH mode" by default for "minimal module compatibility",
