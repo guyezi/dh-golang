@@ -1,3 +1,10 @@
+dh-golang (1.41) unstable; urgency=medium
+
+  * Add "go clean -modcache" call before rmdir_builddir()
+    to remove the unwritable directories under $GOPATH/pkg/mod
+
+ -- Anthony Fok <foka@debian.org>  Sat, 03 Aug 2019 23:47:20 -0600
+
 dh-golang (1.40) unstable; urgency=medium
 
   * Set GOCACHE to a safely writable directory because the build cache is
