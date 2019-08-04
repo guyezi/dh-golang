@@ -294,7 +294,7 @@ sub _set_gocache {
 
     # Set GOCACHE to a directory where the go command can safely write to.
     my $this = shift;
-    $ENV{GOCACHE} = $this->{cwd} . '/' . $this->get_builddir() . '/go-build'
+    $ENV{GOCACHE} = $this->{cwd} . '/' . $this->get_buildpath('go-build')
 }
 
 sub _set_go111module {
@@ -588,6 +588,14 @@ sub install {
 sub clean {
     my $this = shift;
 
+    $this->_set_gopath();
+    $this->_set_go111module();
+
+    # "go clean -modcache" is new in Go 1.11, so run it only if
+    # $GOPATH/pkg/mod exists to avoid error with older Go versions.
+    if (-d $this->get_buildpath("pkg/mod")) {
+        $this->doit_in_builddir("go", "clean", "-modcache");
+    }
     $this->rmdir_builddir();
 }
 
