@@ -1,7 +1,7 @@
 Source: dh-golang
 Maintainer: Debian Go Packaging Team <team+pkg-go@tracker.debian.org>
 Uploaders: Michael Stapelberg <stapelberg@debian.org>,
-           Martín Ferrari <tincho@debian.org>,
+           Martína Ferrari <tincho@debian.org>,
            Anthony Fok <foka@debian.org>,
            Dr. Tobias Quathamer <toddy@debian.org>,
 Section: devel
