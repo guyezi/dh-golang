@@ -1,3 +1,38 @@
+dh-golang (1.42) unstable; urgency=medium
+
+  [ Guillem Jover ]
+  * Properly handle Go-Import-Path being a multi-line field.
+    A multi-line field can start with a blank line after the field, we
+    should cope with that. Such as in:
+      Go-Import-Path:
+       some-import-path,
+       other-import-path,
+  * Recommend building object files under _build/
+    By default the build directory is arch-qualified, which means that we
+    cannot easily ignore them in places like .gitignore. Use a well-known
+    pathname for this.
+  * Use Uploaders instead of Maintainers in debian/control example file
+  * Wrap, sort, and add trailing commas to multi-line fields.
+    Format fields in a way that minimizes diff output and that makes it
+    easier to copy & paste or move lines around between fields:
+     - Adding a trailing comma on the last entry makes appending new
+       entries not affect the last one.
+     - Sorting makes the contents easier to find and easier to avoid
+       adding duplicates.
+  * Switch to Standards-Version 4.4.0 in example/control
+  * Switch to debhelper-compat (= 12) in example/control.
+    This matches the main packaging, and gets rid of the requirement for
+    the debian/compat file, which was not present in the example directory
+    anyway.
+  * Set Rules-Requires-Root to no
+  * Remove boilerplate comment from debian/rules
+
+  [ Dr. Tobias Quathamer ]
+  * Add myself as uploader
+  * Correct Martína's name
+
+ -- Dr. Tobias Quathamer <toddy@debian.org>  Sat, 07 Sep 2019 18:10:27 +0200
+
 dh-golang (1.41) unstable; urgency=medium
 
   * Add "go clean -modcache" call before rmdir_builddir()
