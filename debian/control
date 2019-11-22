@@ -6,12 +6,12 @@ Uploaders: Michael Stapelberg <stapelberg@debian.org>,
            Dr. Tobias Quathamer <toddy@debian.org>,
 Section: devel
 Priority: optional
-Rules-Requires-Root: no
 Build-Depends: debhelper-compat (= 12),
                libmodule-install-perl,
-Standards-Version: 4.4.0
+Standards-Version: 4.4.1
 Vcs-Browser: https://salsa.debian.org/go-team/packages/dh-golang
 Vcs-Git: https://salsa.debian.org/go-team/packages/dh-golang.git
+Rules-Requires-Root: no
 
 Package: dh-golang
 Architecture: all
