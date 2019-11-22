@@ -1,14 +1,20 @@
-dh-golang (1.42+nmu1) UNRELEASED; urgency=medium
+dh-golang (1.43) unstable; urgency=medium
 
-  * Non-maintainer upload.
-  * Make dh-golang work with cross compiling. (Closes: #-1)
+  [ Helmut Grohne ]
+  * Make dh-golang work with cross compiling. (Closes: #930176)
     + Set up cross environment variables GOOS, GOARCH and GOARM.
     + Set up a C compiler in CC.
     + Always use cgo (enabled by default for native builds).
     + Cross go install installs to GOPATH/bin/GOOS_GOARCH.
     + Mark dh-golang Multi-Arch: foreign.
 
- -- Helmut Grohne <helmut@subdivi.de>  Fri, 07 Jun 2019 20:06:44 +0200
+  [ Anthony Fok ]
+  * Correct Martina's name
+  * Bump Standards-Version to 4.4.1 (no change)
+  * Add debian/gbp.conf and switch master to debian/sid
+    to conform with DEP-14
+
+ -- Anthony Fok <foka@debian.org>  Fri, 22 Nov 2019 15:14:21 -0700
 
 dh-golang (1.42) unstable; urgency=medium
 
